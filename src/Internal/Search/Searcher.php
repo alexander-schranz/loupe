@@ -429,7 +429,7 @@ class Searcher
             $operator = $node->operator;
 
             if (! \in_array($node->attribute, $this->engine->getIndexInfo()->getFilterableAttributes(), true)) {
-                $whereStatement[] =  $operator->isNegative() ? '1 = 1' : '1 = 0'; // none existing filter fields need be handled as no match if positive as match if negative
+                $whereStatement[] =  $operator->isNegative() ? '(1 = 1)' : '(1 = 0)'; // none existing filter fields need be handled as no match if positive as match if negative
             } elseif (\in_array($node->attribute, $this->engine->getIndexInfo()->getMultiFilterableAttributes(), true)) {
                 $whereStatement[] = sprintf($documentAlias . '.id %s (', $operator->isNegative() ? 'NOT IN' : 'IN');
                 $whereStatement[] = $this->createSubQueryForMultiAttribute($node);
