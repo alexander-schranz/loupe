@@ -207,12 +207,12 @@ class IndexInfo
     {
         $documentSchema = $this->getDocumentSchema();
 
-        if (\count(array_diff_key($documentSchema, $document)) !== 0) {
-            throw InvalidDocumentException::becauseDoesNotMatchSchema(
-                $documentSchema,
-                $document,
-                $document[$this->engine->getConfiguration()->getPrimaryKey()] ?? null
-            );
+        $missingColumns = array_diff_key($documentSchema, $document);
+
+        if (count($missingColumns) !== 0) {
+            foreach ($missingColumns as $missingColumn => $type) {
+                $document[$missingColumn] = LoupeTypes::isSingleType($type) ? null : [];
+            }
         }
 
         $schemaNarrowed = false;
