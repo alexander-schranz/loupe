@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Loupe\Loupe\Internal;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\AbstractSQLiteDriver;
 use Doctrine\DBAL\Driver\API\SQLite\UserDefinedFunctions;
@@ -75,6 +76,25 @@ class Engine
         $indexer->addDocuments($documents);
 
         return $this;
+    }
+
+    /**
+     * @param array<int|string> $ids
+     */
+    public function deleteDocuments(array $ids): void
+    {
+        $this->getConnection()
+            ->executeStatement(
+                sprintf('DELETE FROM %s WHERE user_id IN(:ids)', IndexInfo::TABLE_NAME_DOCUMENTS),
+                [
+                    'ids' => array_map(function(string $id) {
+                        return LoupeTypes::convertToString($id);
+                    }, $ids),
+                ],
+                [
+                    'ids' => ArrayParameterType::STRING,
+                ]
+            );
     }
 
     public function countDocuments(): int
