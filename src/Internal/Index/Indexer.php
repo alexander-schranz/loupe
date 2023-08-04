@@ -116,6 +116,8 @@ class Indexer
                 continue;
             }
 
+            $attributeValue = $document[$attribute] ?? null;
+
             $loupeType = $this->engine->getIndexInfo()
                 ->getLoupeTypeForAttribute($attribute);
 
@@ -124,16 +126,16 @@ class Indexer
             }
 
             if ($loupeType === LoupeTypes::TYPE_GEO) {
-                if (! isset($document[$attribute]['lat'], $document[$attribute]['lng'])) {
+                if (! isset($attributeValue['lat'], $attributeValue['lng'])) {
                     continue;
                 }
 
-                $data[$attribute . '_geo_lat'] = $document[$attribute]['lat'];
-                $data[$attribute . '_geo_lng'] = $document[$attribute]['lng'];
+                $data[$attribute . '_geo_lat'] = $attributeValue['lat'];
+                $data[$attribute . '_geo_lng'] = $attributeValue['lng'];
                 continue;
             }
 
-            $data[$attribute] = LoupeTypes::convertValueToType($document[$attribute], $loupeType);
+            $data[$attribute] = LoupeTypes::convertValueToType($attributeValue, $loupeType);
         }
 
         return $this->engine->upsert(
@@ -147,7 +149,7 @@ class Indexer
     private function indexMultiAttributes(array $document, int $documentId): void
     {
         foreach ($this->engine->getIndexInfo()->getMultiFilterableAttributes() as $attribute) {
-            $attributeValue = $document[$attribute];
+            $attributeValue = $document[$attribute] ?? null;
 
             $convertedValue = LoupeTypes::convertValueToType(
                 $attributeValue,

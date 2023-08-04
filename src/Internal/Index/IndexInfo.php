@@ -207,14 +207,6 @@ class IndexInfo
     {
         $documentSchema = $this->getDocumentSchema();
 
-        $missingColumns = array_diff_key($documentSchema, $document);
-
-        if (count($missingColumns) !== 0) {
-            foreach ($missingColumns as $missingColumn => $type) {
-                $document[$missingColumn] = LoupeTypes::isSingleType($type) ? null : [];
-            }
-        }
-
         $schemaNarrowed = false;
 
         foreach ($document as $attributeName => $attributeValue) {

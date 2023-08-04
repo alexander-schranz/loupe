@@ -33,6 +33,27 @@ class IndexTest extends TestCase
         ]);
     }
 
+    public function testSchemaAllowMissingFields(): void
+    {
+        $configuration = Configuration::create()
+            ->withFilterableAttributes(['departments', 'gender'])
+            ->withSortableAttributes(['firstname'])
+        ;
+
+        $loupe = $this->createLoupe($configuration);
+
+        $uta = [
+            'id' => 2,
+            'firstname' => 'Uta',
+            'lastname' => 'Koertig',
+        ];
+
+        $loupe->addDocument($this->getSandraDocument());
+        $loupe->addDocument($uta);
+
+        $this->assertSame($uta, $loupe->getDocument(2));
+    }
+
     public function testIrrelevantAttributesAreIgnoredBySchemaValidation(): void
     {
         $configuration = Configuration::create()
