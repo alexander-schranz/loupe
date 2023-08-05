@@ -14,6 +14,7 @@ enum Operator: string
     case In = 'IN';
     case LowerThan = '<';
     case LowerThanOrEquals = '<=';
+    case NotEquals = '!=';
     case NotIn = 'NOT IN';
 
     public function buildSql(\Doctrine\DBAL\Connection $connection, float|string|array $value): string
@@ -28,6 +29,7 @@ enum Operator: string
 
         return match ($this) {
             self::Equals,
+            self::NotEquals,
             self::GreaterThan,
             self::GreaterThanOrEquals,
             self::LowerThan,
@@ -40,6 +42,7 @@ enum Operator: string
     {
         return match ($operator) {
             '=' => self::Equals,
+            '!=' => self::NotEquals,
             '>' => self::GreaterThan,
             '>=' => self::GreaterThanOrEquals,
             '<' => self::LowerThan,
@@ -47,6 +50,16 @@ enum Operator: string
             'IN' => self::In,
             'NOT IN' => self::NotIn,
             default => throw new \InvalidArgumentException('Invalid operator given.')
+        };
+    }
+
+    public function getMultiValueOperator(): self
+    {
+        return match ($this) {
+            // negatives need to be inverted for the multi value check so they are correctly filtered out
+            self::NotEquals => self::Equals,
+            self::NotIn => self::In,
+            default => $this,
         };
     }
 
